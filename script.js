@@ -84,16 +84,6 @@ function moveDuck(event) {
       break;
   }
 
-  const duck = document.getElementById("duck");
-  const touch = event.touches[0] || event.changedTouches[0];
-  if (touch) {
-    duck.style.left = `${touch.pageX}px`;
-    duck.style.top = `${touch.pageY}px`;
-  } else {
-    duck.style.left = `${event.clientX}px`;
-    duck.style.top = `${event.clientY}px`;
-  }
-
   render();
 }
 
@@ -166,7 +156,3 @@ document.addEventListener("keyup", moveDuck);
 playAgainBtn.addEventListener("click", function () {
   location.reload();
 });
-
-const duck = document.getElementById("duck");
-duck.addEventListener("mousedown", moveDuck);
-duck.addEventListener("touchstart", moveDuck);
