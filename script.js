@@ -124,10 +124,28 @@ function animateGame() {
 }
 
 // Game Win/Loss Logic
+function endGame() {
+  // Stop the countdown timer
+  clearInterval(countdownLoop);
+  // Stop the game loop
+  clearInterval(renderLoop);
+
+  // Stop the player from being able to control the duck
+  document.removeEventListener("keyup", moveDuck);
+
+  // Display the game over screen
+  endGameScreen.classList.remove("hidden");
+}
+
 function countdown() {
   if (time !== 0) {
     time--;
     timer.innerText = time.toString().padStart(5, "0");
+  }
+
+  if (time === 0) {
+    // end the game -- player has lost!
+    endGame();
   }
 }
 
