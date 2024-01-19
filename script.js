@@ -24,15 +24,13 @@ const riverRows = [1, 2];
 const roadRows = [4, 5, 6];
 const duckPosition = { x: 4, y: 8 };
 let contentBeforeDuck = "";
-const time = 15;
+let time = 15;
 
 function drawGrid() {
-  gridMatrix.innerHTML = "";
+  grid.innerHTML = "";
 
   // For each row in the gridMAtrix, we need to process what is going to be drawn / displayed on the screen
   gridMatrix.forEach(function (gridRow, gridRowIndex) {
-    console.log(gridRowIndex, gridRow);
-
     gridRow.forEach(function (cellContent, cellContentIndex) {
       // console.log(cellContentIndex, cellContent)
       // Given the current grid row, create a cell for the grid in the game based on the cellContent
@@ -42,7 +40,7 @@ function drawGrid() {
 
       // [1,2]
       if (riverRows.includes(gridRowIndex)) {
-        cellDiv.classList.add("cell");
+        cellDiv.classList.add("river");
       } else if (roadRows.includes(gridRowIndex)) {
         cellDiv.classList.add("road");
         // '' --> "falsy"
@@ -52,9 +50,59 @@ function drawGrid() {
         cellDiv.classList.add(cellContent);
       }
 
-      gridMatrix.appendChild(cellDiv);
+      grid.appendChild(cellDiv);
     });
   });
 }
 
-drawGrid();
+function placeDuck() {
+  contentBeforeDuck = gridMatrix[duckPosition.y][duckPosition.x];
+  gridMatrix[duckPosition.y][duckPosition.x] = "duck";
+  // gridMatrix[8][4] = 'duck'
+  // ['', '', '', 'duck', '','','','']
+}
+
+function moveDuck(event) {
+  const key = event.key;
+  console.log("key", key);
+  console.log("contentBeforeDuck: ", contentBeforeDuck);
+  gridMatrix[duckPosition.y][duckPosition.x] = contentBeforeDuck;
+
+  // arrows and "WASD"
+  switch (key) {
+    case "ArrowUp":
+    case "w":
+    case "W":
+      if (duckPosition.y > 0) duckPosition.y--;
+      break;
+    case "ArrowDown":
+    case "s":
+    case "S":
+      if (duckPosition.y < 8) duckPosition.y++;
+      break;
+    case "ArrowLeft":
+    case "a":
+    case "A":
+      if (duckPosition.x > 0) duckPosition.x--;
+      break;
+    case "ArrowRight":
+    case "d":
+    case "D":
+      if (duckPosition.x < 8) duckPosition.x++;
+      break;
+  }
+  render();
+}
+
+function render() {
+  placeDuck();
+  drawGrid();
+}
+
+// anonymous function
+const renderLoop = setInterval(function () {
+  gridMatrix[duckPosition.y][duckPosition.x] = contentBeforeDuck;
+  render();
+}, 600);
+
+document.addEventListener("keyup", moveDuck);
