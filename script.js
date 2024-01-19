@@ -166,3 +166,6 @@ const renderLoop = setInterval(function () {
 const countdownLoop = setInterval(countdown, 1000);
 
 document.addEventListener("keyup", moveDuck);
+playAgainBtn.addEventListener("click", function () {
+  location.reload();
+});
