@@ -1,4 +1,4 @@
-// Selectthe relevant elements from the HTML
+// Select the relevant elements from the HTML
 const grid = document.querySelector(".grid");
 const timer = document.querySelector(".timer");
 const endGameScreen = document.querySelector(".end-game-screen");
@@ -29,21 +29,17 @@ let time = 15;
 function drawGrid() {
   grid.innerHTML = "";
 
-  // For each row in the gridMAtrix, we need to process what is going to be drawn / displayed on the screen
+  // For each row in the gridMatrix, we need to process what is going to be drawn / displayed on the screen
   gridMatrix.forEach(function (gridRow, gridRowIndex) {
     gridRow.forEach(function (cellContent, cellContentIndex) {
-      // console.log(cellContentIndex, cellContent)
       // Given the current grid row, create a cell for the grid in the game based on the cellContent
       const cellDiv = document.createElement("div");
-      // <div class="cell"></div>
       cellDiv.classList.add("cell");
 
-      // [1,2]
       if (riverRows.includes(gridRowIndex)) {
         cellDiv.classList.add("river");
       } else if (roadRows.includes(gridRowIndex)) {
         cellDiv.classList.add("road");
-        // '' --> "falsy"
       }
 
       if (cellContent) {
@@ -58,16 +54,12 @@ function drawGrid() {
 function placeDuck() {
   contentBeforeDuck = gridMatrix[duckPosition.y][duckPosition.x];
   gridMatrix[duckPosition.y][duckPosition.x] = "duck";
-  // gridMatrix[8][4] = 'duck'
-  // ['', '', '', 'duck', '','','','']
 }
 
 function moveDuck(event) {
   const key = event.key;
-  console.log("key", key);
-  console.log("contentBeforeDuck: ", contentBeforeDuck);
+  console.log(key);
   gridMatrix[duckPosition.y][duckPosition.x] = contentBeforeDuck;
-
   // arrows and "WASD"
   switch (key) {
     case "ArrowUp":
@@ -91,48 +83,42 @@ function moveDuck(event) {
       if (duckPosition.x < 8) duckPosition.x++;
       break;
   }
+
   render();
 }
 
-// Animation Functions
-function moveRight(gridRowIndex) {
-  // Get all of the cells in the current row
-  const currentRow = gridMatrix[gridRowIndex];
+function updateDuckPosition() {
+  gridMatrix[duckPosition.y][duckPosition.x] = contentBeforeDuck;
 
-  // Remove the last element...
-  const lastElement = currentRow.pop();
-
-  // And put it back to the beginning, i.e. index 0
-  currentRow.unshift(lastElement);
+  if (contentBeforeDuck === "wood") {
+    if (duckPosition.y === 1 && duckPosition.x < 8) duckPosition.x++;
+    else if (duckPosition.y === 2 && duckPosition.x > 0) duckPosition.x--;
+  }
 }
 
-function moveLeft(gridRowIndex) {
-  const currentRow = gridMatrix[gridRowIndex];
-  const firstElement = currentRow.shift();
-  currentRow.push(firstElement);
+function checkPosition() {
+  if (duckPosition.y === victoryRow) endGame("duck-arrived");
+  else if (contentBeforeDuck === "river") endGame("duck-drowned");
+  else if (contentBeforeDuck === "car" || contentBeforeDuck === "bus") endGame("duck-hit");
 }
+// -------------------
+// GAME WIN/LOSS LOGIC
+// -------------------
+function endGame(reason) {
+  // Victory
+  if (reason === "duck-arrived") {
+    endGameText.innerHTML = "YOU<br>WIN!!";
+    endGameScreen.classList.add("win");
+  }
 
-function animateGame() {
-  // Animate river:
-  moveRight(1);
-  moveLeft(2);
+  gridMatrix[duckPosition.y][duckPosition.x] = reason;
 
-  // Animate road:
-  moveRight(4);
-  moveRight(5);
-  moveRight(6);
-}
-
-// Game Win/Loss Logic
-function endGame() {
   // Stop the countdown timer
   clearInterval(countdownLoop);
   // Stop the game loop
   clearInterval(renderLoop);
-
   // Stop the player from being able to control the duck
   document.removeEventListener("keyup", moveDuck);
-
   // Display the game over screen
   endGameScreen.classList.remove("hidden");
 }
@@ -149,16 +135,17 @@ function countdown() {
   }
 }
 
-// Rendering
+// RUNNING THE GAME
 
 function render() {
   placeDuck();
+  checkPosition();
   drawGrid();
 }
 
 // anonymous function
 const renderLoop = setInterval(function () {
-  gridMatrix[duckPosition.y][duckPosition.x] = contentBeforeDuck;
+  updateDuckPosition();
   animateGame();
   render();
 }, 600);
