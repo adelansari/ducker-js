@@ -94,6 +94,45 @@ function moveDuck(event) {
   render();
 }
 
+// Animation Functions
+function moveRight(gridRowIndex) {
+  // Get all of the cells in the current row
+  const currentRow = gridMatrix[gridRowIndex];
+
+  // Remove the last element...
+  const lastElement = currentRow.pop();
+
+  // And put it back to the beginning, i.e. index 0
+  currentRow.unshift(lastElement);
+}
+
+function moveLeft(gridRowIndex) {
+  const currentRow = gridMatrix[gridRowIndex];
+  const firstElement = currentRow.shift();
+  currentRow.push(firstElement);
+}
+
+function animateGame() {
+  // Animate river:
+  moveRight(1);
+  moveLeft(2);
+
+  // Animate road:
+  moveRight(4);
+  moveRight(5);
+  moveRight(6);
+}
+
+// Game Win/Loss Logic
+function countdown() {
+  if (time !== 0) {
+    time--;
+    timer.innerText = time.toString().padStart(5, "0");
+  }
+}
+
+// Rendering
+
 function render() {
   placeDuck();
   drawGrid();
@@ -102,7 +141,10 @@ function render() {
 // anonymous function
 const renderLoop = setInterval(function () {
   gridMatrix[duckPosition.y][duckPosition.x] = contentBeforeDuck;
+  animateGame();
   render();
 }, 600);
+
+const countdownLoop = setInterval(countdown, 1000);
 
 document.addEventListener("keyup", moveDuck);
